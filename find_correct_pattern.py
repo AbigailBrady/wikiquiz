@@ -5,7 +5,7 @@ import wikipedia
 
 def find_question_body(title):
     summary = wikipedia.summary(title, sentences=1)
-    m = re.match(f"{title}.*?is a (.*$)", summary)
+    m = re.match(f"{title}.*?(?:is|was) a (.*$)", summary)
     if m:
         return m.groups()[0]
     else:
