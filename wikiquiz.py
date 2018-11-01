@@ -1,15 +1,27 @@
 import random, sys, wikipedia
+import re
 
 def randomPage():
     try:
-        page = wikipedia.page(wikipedia.random())
-        page.summary
-        return page
-    except:
+        while True:
+            page = wikipedia.page(wikipedia.random())
+            if gen_question(wikipedia.summary(page.title, sentences=1)):
+                return page
+    except wikipedia.exceptions.DisambiguationError as e:
         return randomPage()
        
-def obfuscate(r):
-    return r
+def gen_question(summary):
+    start = summary.find(" is ")
+
+#    if start != -1:
+#       start = summary.find(" was ")
+
+    end = min(summary.find(".", start), summary.find(",", start))
+    
+    if start == -1:
+        return None
+    else:
+        return "What/Who " + summary[start+1:end] + "?"
        
 
 options = ["A", "B", "C", "D"]
@@ -25,15 +37,14 @@ while True:
     pages = [randomPage() for _ in range(4)]
     whichPage = random.randint(0, len(options) - 1)
 
-    print("\f")
+    print("\033c")
 
     print(f"WIKIPEDIA QUIZ THINGY!!!!!!!!!  SCORE: {score} OUT OF {attempts}")
     print()
     print()
-    print("  this is the start of a Wikipedia article.  your task is to identify which one.")
     print()
     print()
-    print(obfuscate(pages[whichPage].summary))
+    print(gen_question(wikipedia.summary(pages[whichPage].title, sentences=1)))
     print()
     print()
 
@@ -46,7 +57,7 @@ while True:
     sys.stdout.flush()
       
     input = sys.stdin.readline().rstrip()
-    while input not in options:
+    while input.upper() not in options:
         print("   not a valid option, try again.")
         sys.stdout.flush()
         input = sys.stdin.readline().rstrip()
